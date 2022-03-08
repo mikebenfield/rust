@@ -3303,10 +3303,15 @@ mod size_asserts {
     rustc_data_structures::static_assert_size!(super::Expr<'static>, 56);
     rustc_data_structures::static_assert_size!(super::Pat<'static>, 88);
     rustc_data_structures::static_assert_size!(super::QPath<'static>, 24);
-    rustc_data_structures::static_assert_size!(super::Ty<'static>, 72);
+    #[cfg(not(bootstrap))]
+    rustc_data_structures::static_assert_size!(super::Ty<'static>, 64);
 
-    rustc_data_structures::static_assert_size!(super::Item<'static>, 184);
-    rustc_data_structures::static_assert_size!(super::TraitItem<'static>, 128);
-    rustc_data_structures::static_assert_size!(super::ImplItem<'static>, 144);
-    rustc_data_structures::static_assert_size!(super::ForeignItem<'static>, 136);
+    #[cfg(not(bootstrap))]
+    rustc_data_structures::static_assert_size!(super::Item<'static>, 168);
+    #[cfg(not(bootstrap))]
+    rustc_data_structures::static_assert_size!(super::TraitItem<'static>, 120);
+    #[cfg(not(bootstrap))]
+    rustc_data_structures::static_assert_size!(super::ImplItem<'static>, 128);
+    #[cfg(not(bootstrap))]
+    rustc_data_structures::static_assert_size!(super::ForeignItem<'static>, 128);
 }

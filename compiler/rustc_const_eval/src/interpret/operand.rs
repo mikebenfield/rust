@@ -32,8 +32,8 @@ pub enum Immediate<Tag: Provenance = AllocId> {
     ScalarPair(ScalarMaybeUninit<Tag>, ScalarMaybeUninit<Tag>),
 }
 
-#[cfg(all(target_arch = "x86_64", target_pointer_width = "64"))]
-rustc_data_structures::static_assert_size!(Immediate, 56);
+#[cfg(all(target_arch = "x86_64", target_pointer_width = "64", not(bootstrap)))]
+rustc_data_structures::static_assert_size!(Immediate, 48);
 
 impl<Tag: Provenance> From<ScalarMaybeUninit<Tag>> for Immediate<Tag> {
     #[inline(always)]
@@ -102,8 +102,8 @@ pub struct ImmTy<'tcx, Tag: Provenance = AllocId> {
     pub layout: TyAndLayout<'tcx>,
 }
 
-#[cfg(all(target_arch = "x86_64", target_pointer_width = "64"))]
-rustc_data_structures::static_assert_size!(ImmTy<'_>, 72);
+#[cfg(all(target_arch = "x86_64", target_pointer_width = "64", not(bootstrap)))]
+rustc_data_structures::static_assert_size!(ImmTy<'_>, 64);
 
 impl<Tag: Provenance> std::fmt::Display for ImmTy<'_, Tag> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -175,8 +175,8 @@ pub struct OpTy<'tcx, Tag: Provenance = AllocId> {
     pub layout: TyAndLayout<'tcx>,
 }
 
-#[cfg(all(target_arch = "x86_64", target_pointer_width = "64"))]
-rustc_data_structures::static_assert_size!(OpTy<'_>, 80);
+#[cfg(all(target_arch = "x86_64", target_pointer_width = "64", not(bootstrap)))]
+rustc_data_structures::static_assert_size!(OpTy<'_>, 72);
 
 impl<'tcx, Tag: Provenance> std::ops::Deref for OpTy<'tcx, Tag> {
     type Target = Operand<Tag>;

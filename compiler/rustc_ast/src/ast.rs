@@ -2877,8 +2877,8 @@ pub enum AssocItemKind {
     MacCall(MacCall),
 }
 
-#[cfg(all(target_arch = "x86_64", target_pointer_width = "64"))]
-rustc_data_structures::static_assert_size!(AssocItemKind, 72);
+#[cfg(all(target_arch = "x86_64", target_pointer_width = "64", not(bootstrap)))]
+rustc_data_structures::static_assert_size!(AssocItemKind, 64);
 
 impl AssocItemKind {
     pub fn defaultness(&self) -> Defaultness {
@@ -2929,8 +2929,8 @@ pub enum ForeignItemKind {
     MacCall(MacCall),
 }
 
-#[cfg(all(target_arch = "x86_64", target_pointer_width = "64"))]
-rustc_data_structures::static_assert_size!(ForeignItemKind, 72);
+#[cfg(all(target_arch = "x86_64", target_pointer_width = "64", not(bootstrap)))]
+rustc_data_structures::static_assert_size!(ForeignItemKind, 64);
 
 impl From<ForeignItemKind> for ItemKind {
     fn from(foreign_item_kind: ForeignItemKind) -> ItemKind {

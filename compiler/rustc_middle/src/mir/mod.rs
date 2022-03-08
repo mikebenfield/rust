@@ -2300,8 +2300,8 @@ pub enum AggregateKind<'tcx> {
     Generator(DefId, SubstsRef<'tcx>, hir::Movability),
 }
 
-#[cfg(all(target_arch = "x86_64", target_pointer_width = "64"))]
-static_assert_size!(AggregateKind<'_>, 48);
+#[cfg(all(target_arch = "x86_64", target_pointer_width = "64", not(bootstrap)))]
+static_assert_size!(AggregateKind<'_>, 40);
 
 #[derive(Copy, Clone, Debug, PartialEq, PartialOrd, Eq, TyEncodable, TyDecodable, Hash, HashStable)]
 pub enum BinOp {

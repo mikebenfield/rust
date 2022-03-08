@@ -77,8 +77,8 @@ pub enum Place<Tag: Provenance = AllocId> {
     Local { frame: usize, local: mir::Local },
 }
 
-#[cfg(all(target_arch = "x86_64", target_pointer_width = "64"))]
-rustc_data_structures::static_assert_size!(Place, 56);
+#[cfg(all(target_arch = "x86_64", target_pointer_width = "64", not(bootstrap)))]
+rustc_data_structures::static_assert_size!(Place, 48);
 
 #[derive(Copy, Clone, Debug)]
 pub struct PlaceTy<'tcx, Tag: Provenance = AllocId> {
@@ -86,8 +86,8 @@ pub struct PlaceTy<'tcx, Tag: Provenance = AllocId> {
     pub layout: TyAndLayout<'tcx>,
 }
 
-#[cfg(all(target_arch = "x86_64", target_pointer_width = "64"))]
-rustc_data_structures::static_assert_size!(PlaceTy<'_>, 72);
+#[cfg(all(target_arch = "x86_64", target_pointer_width = "64", not(bootstrap)))]
+rustc_data_structures::static_assert_size!(PlaceTy<'_>, 64);
 
 impl<'tcx, Tag: Provenance> std::ops::Deref for PlaceTy<'tcx, Tag> {
     type Target = Place<Tag>;
