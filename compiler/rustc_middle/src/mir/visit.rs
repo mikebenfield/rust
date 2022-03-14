@@ -706,6 +706,14 @@ macro_rules! make_mir_visitor {
                         );
                     }
 
+                    Rvalue::RelativeDiscriminant(place) => {
+                        self.visit_place(
+                            place,
+                            PlaceContext::NonMutatingUse(NonMutatingUseContext::Inspect),
+                            location
+                        );
+                    }
+
                     Rvalue::NullaryOp(_op, ty) => {
                         self.visit_ty($(& $mutability)? *ty, TyContext::Location(location));
                     }

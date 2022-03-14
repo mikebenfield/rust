@@ -635,6 +635,21 @@ impl<'mir, 'tcx: 'mir, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
         &self,
         op: &OpTy<'tcx, M::PointerTag>,
     ) -> InterpResult<'tcx, (Scalar<M::PointerTag>, VariantIdx)> {
+        self.read_discriminant_either(op, true)
+    }
+
+    pub fn read_relative_discriminant(
+        &self,
+        op: &OpTy<'tcx, M::PointerTag>,
+    ) -> InterpResult<'tcx, (Scalar<M::PointerTag>, VariantIdx)> {
+        self.read_discriminant_either(op, false)
+    }
+
+    fn read_discriminant_either(
+        &self,
+        op: &OpTy<'tcx, M::PointerTag>,
+        use_full_discriminant: bool,
+    ) -> InterpResult<'tcx, (Scalar<M::PointerTag>, VariantIdx)> {
         trace!("read_discriminant_value {:#?}", op.layout);
         // Get type and layout of the discriminant.
         let discr_layout = self.layout_of(op.layout.ty.discriminant_ty(*self.tcx))?;
@@ -722,7 +737,7 @@ impl<'mir, 'tcx: 'mir, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
                 // discriminant (encoded in niche/tag) and variant index are the same.
                 let variants_start = niche_variants.start().as_u32();
                 let variants_end = niche_variants.end().as_u32();
-                let variant = match tag_val.try_to_int() {
+                match tag_val.try_to_int() {
                     Err(dbg_val) => {
                         // So this is a pointer then, and casting to an int failed.
                         // Can only happen during CTFE.
@@ -734,7 +749,11 @@ impl<'mir, 'tcx: 'mir, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
                         if !ptr_valid {
                             throw_ub!(InvalidTag(dbg_val))
                         }
-                        dataful_variant
+                        assert!(use_full_discriminant);
+                        (
+                            Scalar::from_uint(dataful_variant.as_u32(), discr_layout.size),
+                            dataful_variant,
+                        )
                     }
                     Ok(tag_bits) => {
                         let tag_bits = tag_bits.assert_bits(tag_layout.size);
@@ -748,7 +767,9 @@ impl<'mir, 'tcx: 'mir, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
                             .to_scalar()?
                             .assert_bits(tag_val.layout.size);
                         // Check if this is in the range that indicates an actual discriminant.
-                        if variant_index_relative <= u128::from(variants_end - variants_start) {
+                        let variant = if variant_index_relative
+                            <= u128::from(variants_end - variants_start)
+                        {
                             let variant_index_relative = u32::try_from(variant_index_relative)
                                 .expect("we checked that this fits into a u32");
                             // Then computing the absolute variant idx should not overflow any more.
@@ -766,13 +787,17 @@ impl<'mir, 'tcx: 'mir, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
                             VariantIdx::from_u32(variant_index)
                         } else {
                             dataful_variant
+                        };
+
+                        if use_full_discriminant {
+                            (Scalar::from_uint(variant.as_u32(), discr_layout.size), variant)
+                        } else {
+                            // RelativeDiscriminant should only have been produced if this will fit.
+                            assert!(variant_index_relative <= discr_layout.size.unsigned_int_max());
+                            (Scalar::from_uint(variant_index_relative, discr_layout.size), variant)
                         }
                     }
-                };
-                // Compute the size of the scalar we need to return.
-                // No need to cast, because the variant index directly serves as discriminant and is
-                // encoded in the tag.
-                (Scalar::from_uint(variant.as_u32(), discr_layout.size), variant)
+                }
             }
         })
     }

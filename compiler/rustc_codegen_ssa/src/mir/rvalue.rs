@@ -484,6 +484,21 @@ impl<'a, 'tcx, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
                 )
             }
 
+            mir::Rvalue::RelativeDiscriminant(ref place) => {
+                let discr_ty = rvalue.ty(self.mir, bx.tcx());
+                let discr_ty = self.monomorphize(discr_ty);
+                let discr = self
+                    .codegen_place(&mut bx, place.as_ref())
+                    .codegen_get_relative_discr(&mut bx, discr_ty);
+                (
+                    bx,
+                    OperandRef {
+                        val: OperandValue::Immediate(discr),
+                        layout: self.cx.layout_of(discr_ty),
+                    },
+                )
+            }
+
             mir::Rvalue::NullaryOp(null_op, ty) => {
                 let ty = self.monomorphize(ty);
                 assert!(bx.cx().type_is_sized(ty));
@@ -752,6 +767,7 @@ impl<'a, 'tcx, Bx: BuilderMethods<'a, 'tcx>> FunctionCx<'a, 'tcx, Bx> {
             mir::Rvalue::CheckedBinaryOp(..) |
             mir::Rvalue::UnaryOp(..) |
             mir::Rvalue::Discriminant(..) |
+            mir::Rvalue::RelativeDiscriminant(..) |
             mir::Rvalue::NullaryOp(..) |
             mir::Rvalue::ThreadLocalRef(_) |
             mir::Rvalue::Use(..) => // (*)

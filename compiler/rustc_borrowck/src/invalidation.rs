@@ -291,7 +291,9 @@ impl<'cx, 'tcx> InvalidationGenerator<'cx, 'tcx> {
                 self.consume_operand(location, operand)
             }
 
-            Rvalue::Len(place) | Rvalue::Discriminant(place) => {
+            Rvalue::Len(place)
+            | Rvalue::Discriminant(place)
+            | Rvalue::RelativeDiscriminant(place) => {
                 let af = match *rvalue {
                     Rvalue::Len(..) => Some(ArtificialField::ArrayLength),
                     Rvalue::Discriminant(..) => None,

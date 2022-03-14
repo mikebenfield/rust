@@ -917,6 +917,7 @@ impl<'tcx> Visitor<'tcx> for BorrowCollector {
             | Rvalue::NullaryOp(..)
             | Rvalue::UnaryOp(..)
             | Rvalue::Discriminant(..)
+            | Rvalue::RelativeDiscriminant(..)
             | Rvalue::Aggregate(..)
             | Rvalue::ThreadLocalRef(..) => {}
         }

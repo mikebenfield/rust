@@ -215,6 +215,7 @@ impl<'tcx> TypeFoldable<'tcx> for Rvalue<'tcx> {
             ),
             UnaryOp(op, val) => UnaryOp(op, val.try_fold_with(folder)?),
             Discriminant(place) => Discriminant(place.try_fold_with(folder)?),
+            RelativeDiscriminant(place) => RelativeDiscriminant(place.try_fold_with(folder)?),
             NullaryOp(op, ty) => NullaryOp(op, ty.try_fold_with(folder)?),
             Aggregate(kind, fields) => {
                 let kind = kind.try_map_id(|kind| {
@@ -266,6 +267,7 @@ impl<'tcx> TypeFoldable<'tcx> for Rvalue<'tcx> {
             }
             UnaryOp(_, ref val) => val.visit_with(visitor),
             Discriminant(ref place) => place.visit_with(visitor),
+            RelativeDiscriminant(ref place) => place.visit_with(visitor),
             NullaryOp(_, ty) => ty.visit_with(visitor),
             Aggregate(ref kind, ref fields) => {
                 match **kind {

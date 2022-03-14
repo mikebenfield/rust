@@ -207,6 +207,7 @@ where
             | mir::Rvalue::NullaryOp(..)
             | mir::Rvalue::UnaryOp(..)
             | mir::Rvalue::Discriminant(..)
+            | mir::Rvalue::RelativeDiscriminant(..)
             | mir::Rvalue::Aggregate(..) => {}
         }
     }

@@ -720,6 +720,7 @@ impl<'mir, 'tcx> ConstPropagator<'mir, 'tcx> {
             | Rvalue::Cast(..)
             | Rvalue::ShallowInitBox(..)
             | Rvalue::Discriminant(..)
+            | Rvalue::RelativeDiscriminant(..)
             | Rvalue::NullaryOp(..) => {}
         }
 

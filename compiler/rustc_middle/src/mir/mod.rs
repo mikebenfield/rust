@@ -2260,6 +2260,14 @@ pub enum Rvalue<'tcx> {
     /// be defined to return, say, a 0) if ADT is not an enum.
     Discriminant(Place<'tcx>),
 
+    /// If the ADT is niche-optimized, return its relative discriminant.
+    ///
+    /// The relative discriminants are in the range `0 .. niche_variants.len()`;
+    /// that is, they're the normal discriminants minus `niche_variants.start()`.
+    ///
+    /// If the ADT is not niche-optimized, return its discriminant.
+    RelativeDiscriminant(Place<'tcx>),
+
     /// Creates an aggregate value, like a tuple or struct. This is
     /// only needed because we want to distinguish `dest = Foo { x:
     /// ..., y: ... }` from `dest.x = ...; dest.y = ...;` in the case
@@ -2395,6 +2403,7 @@ impl<'tcx> Debug for Rvalue<'tcx> {
             }
             UnaryOp(ref op, ref a) => write!(fmt, "{:?}({:?})", op, a),
             Discriminant(ref place) => write!(fmt, "discriminant({:?})", place),
+            RelativeDiscriminant(ref place) => write!(fmt, "relative_discriminant({:?})", place),
             NullaryOp(ref op, ref t) => write!(fmt, "{:?}({:?})", op, t),
             ThreadLocalRef(did) => ty::tls::with(|tcx| {
                 let muta = tcx.static_mutability(did).unwrap().prefix_str();

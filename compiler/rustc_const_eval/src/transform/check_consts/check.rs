@@ -453,6 +453,7 @@ impl<'tcx> Visitor<'tcx> for Checker<'_, 'tcx> {
             Rvalue::Use(_)
             | Rvalue::Repeat(..)
             | Rvalue::Discriminant(..)
+            | Rvalue::RelativeDiscriminant(..)
             | Rvalue::Len(_)
             | Rvalue::Aggregate(..) => {}
 

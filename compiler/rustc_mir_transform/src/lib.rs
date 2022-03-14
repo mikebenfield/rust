@@ -40,6 +40,7 @@ use pass_manager::{self as pm, Lint, MirLint, WithMinOptLevel};
 mod abort_unwinding_calls;
 mod add_call_guards;
 mod add_moves_for_packed_drops;
+mod add_niche_cases;
 mod add_retag;
 mod check_const_item_mutation;
 mod check_packed_ref;
@@ -465,6 +466,7 @@ fn run_optimization_passes<'tcx>(tcx: TyCtxt<'tcx>, body: &mut Body<'tcx>) {
         tcx,
         body,
         &[
+            &add_niche_cases::AddNicheCases,
             &remove_storage_markers::RemoveStorageMarkers,
             &remove_zsts::RemoveZsts,
             &const_goto::ConstGoto,

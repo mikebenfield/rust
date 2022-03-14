@@ -691,6 +691,16 @@ fn codegen_stmt<'tcx>(
                         crate::discriminant::codegen_get_discriminant(fx, value, dest_layout);
                     lval.write_cvalue(fx, discr);
                 }
+                Rvalue::RelativeDiscriminant(place) => {
+                    let place = codegen_place(fx, place);
+                    let value = place.to_cvalue(fx);
+                    let discr = crate::discriminant::codegen_get_relative_discriminant(
+                        fx,
+                        value,
+                        dest_layout,
+                    );
+                    lval.write_cvalue(fx, discr);
+                }
                 Rvalue::Repeat(ref operand, times) => {
                     let operand = codegen_operand(fx, operand);
                     let times = fx

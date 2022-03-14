@@ -302,6 +302,12 @@ impl<'mir, 'tcx: 'mir, M: Machine<'mir, 'tcx>> InterpCx<'mir, 'tcx, M> {
                 let discr_val = self.read_discriminant(&op)?.0;
                 self.write_scalar(discr_val, &dest)?;
             }
+
+            RelativeDiscriminant(place) => {
+                let op = self.eval_place_to_op(place, None)?;
+                let discr_val = self.read_relative_discriminant(&op)?.0;
+                self.write_scalar(discr_val, &dest)?;
+            }
         }
 
         trace!("{:?}", self.dump_place(*dest));
